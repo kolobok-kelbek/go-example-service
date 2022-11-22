@@ -1,0 +1,40 @@
+root = "/go/src/app"
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o bin/tomato"
+bin = "./bin/tomato"
+full_bin = "/go/bin/dlv --log --continue --headless --listen :40000 --api-version 2 --accept-multiclient exec ./bin/tomato server"
+include_ext = [
+    "go",
+    "yaml",
+    "yml",
+    "json",
+    "html"
+]
+exclude_dir = [
+    ".git",
+    ".idea",
+    "bin",
+    "tmp",
+    "cover",
+    "test"
+]
+exclude_regex = [
+    "_test.go",
+    "_gen.go"
+]
+exclude_file = [
+    ".gitlab-ci.yml",
+    ".golangci.yaml",
+    ".pre-commit-config.yaml",
+    "docker-compose.yaml",
+    "tools.go"
+]
+delay = 1500
+kill_delay = 200
+exclude_unchanged = true
+send_interrupt = true
+
+[misc]
+clean_on_exit = true

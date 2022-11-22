@@ -1,6 +1,6 @@
 package main
 
-import "github.com/kolobok-kelbek/go-example-service/cmd"
+import "github.com/kolobok-kelbek/tomato/cmd"
 
 func main() {
 	cmd.Execute()
