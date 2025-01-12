@@ -1,6 +1,6 @@
 module github.com/kolobok-kelbek/tomato
 
-go 1.21
+go 1.23
 
 require (
 	github.com/kolobok-kelbek/cong v0.2.1
