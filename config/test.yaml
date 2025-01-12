@@ -1,0 +1,6 @@
+
+server:
+  port: :8080
+database:
+  DSN: postgres://dev:dev@localhost:5432/dev?sslmode=disable
+  dialect: postgres

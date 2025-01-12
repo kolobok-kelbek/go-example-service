@@ -1,7 +1,7 @@
 package config
 
 import (
-	db "github.com/kolobok-kelbek/tomato/pkg/db/config"
+	db "github.com/kolobok-kelbek/tomato/internal/db/config"
 )
 
 type Config struct {

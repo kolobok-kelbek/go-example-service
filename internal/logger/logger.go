@@ -17,7 +17,7 @@ type Logger interface {
 	Fatalf(template string, args ...interface{})
 }
 
-func NewLogger() *zap.SugaredLogger {
+func NewLogger() Logger {
 	logger, err := zap.NewProduction()
 	if err != nil {
 		panic(err)

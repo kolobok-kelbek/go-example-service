@@ -1,8 +1,8 @@
 package database
 
 import (
-	"github.com/kolobok-kelbek/tomato/pkg/db/config"
-	"github.com/kolobok-kelbek/tomato/pkg/db/dialect"
+	"github.com/kolobok-kelbek/tomato/internal/db/config"
+	"github.com/kolobok-kelbek/tomato/internal/db/dialect"
 	"log"
 	"os"
 	"time"

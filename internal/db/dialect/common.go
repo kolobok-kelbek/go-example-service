@@ -2,7 +2,7 @@ package dialect
 
 import (
 	"errors"
-	"github.com/kolobok-kelbek/tomato/pkg/db/config"
+	"github.com/kolobok-kelbek/tomato/internal/db/config"
 	"log"
 
 	"gorm.io/gorm"

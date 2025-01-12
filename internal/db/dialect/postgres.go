@@ -1,7 +1,7 @@
 package dialect
 
 import (
-	"github.com/kolobok-kelbek/tomato/pkg/db/config"
+	"github.com/kolobok-kelbek/tomato/internal/db/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

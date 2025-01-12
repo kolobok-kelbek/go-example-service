@@ -1,23 +1,29 @@
 package cmd
 
 import (
-	"fmt"
+	configDir "github.com/kolobok-kelbek/tomato/config"
+	"github.com/kolobok-kelbek/tomato/internal/app"
+	"github.com/kolobok-kelbek/tomato/internal/config"
 	"github.com/spf13/cobra"
-	"io"
-	"net/http"
 )
 
 var serverCmd = &cobra.Command{
 	Use:   "server",
 	Short: "up server",
 	Run: func(cmd *cobra.Command, args []string) {
-		http.HandleFunc("/hello", getHello)
+		cfg, err := config.Load(configDir.Snapshot, config.ProdEnv)
+		if err != nil {
+			panic(err)
+		}
 
-		_ = http.ListenAndServe(":8081", nil)
+		di, err := app.NewDIContainer(cfg)
+		if err != nil {
+			panic(err)
+		}
+
+		err = di.GetApp().Run()
+		if err != nil {
+			panic(err)
+		}
 	},
-}
-
-func getHello(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got /hello request\n")
-	io.WriteString(w, "Hello, HTTP!\n")
 }

@@ -3,9 +3,9 @@ package cmd
 import (
 	configFiles "github.com/kolobok-kelbek/tomato/config"
 	"github.com/kolobok-kelbek/tomato/internal/config"
+	"github.com/kolobok-kelbek/tomato/internal/db"
+	"github.com/kolobok-kelbek/tomato/internal/db/dialect"
 	"github.com/kolobok-kelbek/tomato/migrations"
-	database "github.com/kolobok-kelbek/tomato/pkg/db"
-	"github.com/kolobok-kelbek/tomato/pkg/db/dialect"
 	"github.com/pressly/goose/v3"
 	"github.com/spf13/cobra"
 )
@@ -15,9 +15,13 @@ var migrateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		goose.SetBaseFS(migrations.Snapshot)
 
-		cfg := config.Load(configFiles.Snapshot)
+		cfg, err := config.Load(configFiles.Snapshot, config.ProdEnv)
+		if err != nil {
+			panic(err)
+		}
 
-		if err := goose.SetDialect(cfg.DataBase.Dialect); err != nil {
+		err = goose.SetDialect(cfg.DataBase.Dialect)
+		if err != nil {
 			panic(err)
 		}
 

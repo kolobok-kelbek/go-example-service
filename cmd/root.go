@@ -9,9 +9,6 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "tomato",
 	Short: "Pomadoro managment service",
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		return nil
-	},
 }
 
 func Execute() {

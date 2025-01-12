@@ -5,12 +5,26 @@ import (
 	"github.com/kolobok-kelbek/cong"
 )
 
-func Load(snapshot embed.FS) Config {
-	loader := cong.NewLoader[Config]()
-	cfg, err := loader.LoadFromEmbedFS("Tomato", snapshot, cong.YamlExt)
-	if err != nil {
-		panic(err)
+const (
+	ProdEnv = "prod"
+	TestEnv = "test"
+
+	prodPath = "prod.yaml"
+	testPath = "test.yaml"
+)
+
+func Load(snapshot embed.FS, env string) (*Config, error) {
+	path := prodPath
+	switch env {
+	case TestEnv:
+		path = testPath
 	}
 
-	return *cfg
+	loader := cong.NewLoader[Config]()
+	cfg, err := loader.LoadFromEmbedFSByPath("Tomato", snapshot, path, cong.YamlExt)
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg, err
 }
