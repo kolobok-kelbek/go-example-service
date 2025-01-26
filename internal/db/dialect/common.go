@@ -1,10 +1,8 @@
 package dialect
 
 import (
-	"errors"
+	"github.com/go-task/task/v3/errors"
 	"github.com/kolobok-kelbek/tomato/internal/db/config"
-	"log"
-
 	"gorm.io/gorm"
 )
 
@@ -24,12 +22,10 @@ func NewManager() *Manager {
 	return &producer
 }
 
-func (p *Manager) Produce(config config.DataBase) gorm.Dialector {
+func (p *Manager) Produce(config config.DataBase) (gorm.Dialector, error) {
 	if producer, ok := p.producers[config.Dialect]; ok {
-		return producer(config)
+		return producer(config), nil
 	} else {
-		message := "incorrect dialect: " + config.Dialect
-		log.Fatal(message)
-		panic(errors.New(message)) //nolint:goerr113
+		return nil, errors.New("incorrect dialect: " + config.Dialect)
 	}
 }

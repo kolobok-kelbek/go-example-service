@@ -1,0 +1,18 @@
+version: '3'
+
+tasks:
+  dcup:
+    cmds:
+      - docker compose up -d
+  dcdown:
+    cmds:
+      - docker compose down
+  dcdownv:
+    cmds:
+      - docker compose down -v
+  dcps:
+    cmds:
+      - docker compose ps
+  apilogs:
+    cmds:
+      - docker compose logs tomato-api-service -f

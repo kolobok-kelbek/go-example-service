@@ -11,14 +11,12 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-var db *gorm.DB
-
-func GetDataSource(cfg config.DataBase, dialectManager *dialect.Manager) *gorm.DB {
-	if db != nil {
-		return db
+func GetDataSource(cfg config.DataBase) (*gorm.DB, error) {
+	dialectManager := dialect.NewManager()
+	dialector, err := dialectManager.Produce(cfg)
+	if err != nil {
+		return nil, err
 	}
-
-	dialector := dialectManager.Produce(cfg)
 
 	gormLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
@@ -30,16 +28,14 @@ func GetDataSource(cfg config.DataBase, dialectManager *dialect.Manager) *gorm.D
 		},
 	)
 
-	newDb, err := gorm.Open(dialector, &gorm.Config{
+	db, err := gorm.Open(dialector, &gorm.Config{
 		PrepareStmt: false,
 		Logger:      gormLogger,
 	})
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	db = newDb
-
-	return newDb
+	return db, nil
 }

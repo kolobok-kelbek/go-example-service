@@ -1,6 +1,7 @@
-ARG GOLANG_VERSION=1.23.4
-ARG ALPINE_VERSION=3.17
+ARG GOLANG_VERSION=1.23.5
+ARG ALPINE_VERSION=3.21
 
+# https://hub.docker.com/_/golang
 FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} as golang
 
 ENV GO111MODULE=on
@@ -9,20 +10,18 @@ ENV GOOS="linux"
 ARG UID=1000
 ARG GID=1000
 
-RUN addgroup -S gos --gid $GID                              &&\
-    adduser --uid $UID -S gos -G gos                        &&\
-    apk add --no-cache git gcc musl-dev make bash           &&\
-    # latest не есть хорошо, заменить на точную версию как будет возможность
-    go install github.com/cosmtrek/air@latest               &&\
-    go install github.com/go-delve/delve/cmd/dlv@latest     &&\
-    # завязка на конкретную ветку не есть хорошо, заменить на точную версию как будет возможность
-    go install github.com/google/wire/cmd/wire@main         &&\
-    mkdir -p /go/src/app                                    &&\
-    chown gos:gos -R /go
+RUN addgroup -S tmt --gid $GID &&\
+    adduser --uid $UID -S tmt -G tmt &&\
+    apk add --no-cache git gcc musl-dev make bash &&\
+    go install github.com/air-verse/air@v1.61.7 &&\
+    go install github.com/go-delve/delve/cmd/dlv@v1.24.0 &&\
+    go install github.com/pressly/goose/v3/cmd/goose@v3.24.1&&\
+    mkdir -p /go/src/app &&\
+    chown tmt:tmt -R /go
 
 WORKDIR /go/src/app
 
-USER gos
+USER tmt
 
 FROM golang AS air
 

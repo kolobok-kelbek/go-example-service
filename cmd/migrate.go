@@ -4,7 +4,6 @@ import (
 	configFiles "github.com/kolobok-kelbek/tomato/config"
 	"github.com/kolobok-kelbek/tomato/internal/config"
 	"github.com/kolobok-kelbek/tomato/internal/db"
-	"github.com/kolobok-kelbek/tomato/internal/db/dialect"
 	"github.com/kolobok-kelbek/tomato/migrations"
 	"github.com/pressly/goose/v3"
 	"github.com/spf13/cobra"
@@ -25,8 +24,10 @@ var migrateCmd = &cobra.Command{
 			panic(err)
 		}
 
-		dialectManager := dialect.NewManager()
-		gormDB := database.GetDataSource(cfg.DataBase, dialectManager)
+		gormDB, err := database.GetDataSource(cfg.DataBase)
+		if err != nil {
+			panic(err)
+		}
 
 		db, err := gormDB.DB()
 		if err != nil {

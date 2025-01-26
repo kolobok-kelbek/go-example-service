@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   tomato-proxy:
-    image: traefik:v3.0
+    image: traefik:3.0
     container_name: tomato-proxy
     command:
       - --api.insecure=true
@@ -11,8 +11,8 @@ services:
       - --entrypoints.web.address=:80
       - --providers.docker.exposedbydefault=false
     ports:
-      - 8080:80
-      - 8081:8080
+      - "8080:80"
+      - "8081:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
@@ -25,21 +25,20 @@ services:
       target: air
     container_name: tomato-api-service
     command: [ "-c", "air-api-service.toml" ]
-    #    environment:
     volumes:
       - ./:/go/src/app
       - $GOPATH/pkg:/go/pkg:ro
     ports:
       - "40000:40000"
-      - "8082:8081"
+      - "8082:80"
     networks:
       - tomato
     labels:
       - traefik.enable=true
-      - traefik.http.routers.tomato.rule=Host(`tomato.local`)
+      - traefik.http.routers.tomato.rule=Host(`tomato-api.local`)
       - traefik.http.routers.tomato.entrypoints=web
-      - traefik.http.routers.tomato.service=service-searcher
-      - traefik.http.services.service-tomato.loadbalancer.server.port=80
+      - traefik.http.routers.tomato.service=tomato-api-service
+      - traefik.http.services.tomato-api-service.loadbalancer.server.port=80
     logging:
       driver: 'gelf'
       options:
@@ -47,7 +46,7 @@ services:
         tag: tomato-api-service
 
   tomato-postgres:
-    image: postgres:15.1
+    image: postgres:15.5
     container_name: tomato-postgres
     environment:
       POSTGRES_USER: dev
@@ -57,6 +56,8 @@ services:
       - "5432:5432"
     networks:
       - tomato
+    volumes:
+      - db_data:/var/lib/postgresql/data
     logging:
       driver: 'gelf'
       options:
@@ -78,86 +79,9 @@ services:
     depends_on:
       - tomato-postgres
 
-  tomato-mongodb:
-    image: "mongo:5.0"
-    container_name: tomato-mongodb
-    volumes:
-      - "mongodb_data:/data/db"
-    restart: "on-failure"
-    networks:
-      - tomato
-
-  tomato-opensearch:
-    image: "opensearchproject/opensearch:2.4.0"
-    container_name: tomato-opensearch
-    environment:
-      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
-      - "bootstrap.memory_lock=true"
-      - "discovery.type=single-node"
-      - "action.auto_create_index=false"
-      - "plugins.security.ssl.http.enabled=false"
-      - "plugins.security.disabled=true"
-    ulimits:
-      memlock:
-        hard: -1
-        soft: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    volumes:
-      - "os_data:/usr/share/opensearch/data"
-    restart: "on-failure"
-    networks:
-      - tomato
-
-  tomato-graylog:
-    hostname: "server"
-    image: "${GRAYLOG_IMAGE:-graylog/graylog:5.1.7}"
-    container_name: tomato-graylog
-    depends_on:
-      tomato-opensearch:
-        condition: "service_started"
-      tomato-mongodb:
-        condition: "service_started"
-      tomato-postgres:
-        condition: "service_started"
-      tomato-migrate:
-        condition: "service_started"
-    entrypoint: "/usr/bin/tini -- wait-for-it opensearch:9200 --  /docker-entrypoint.sh"
-    environment:
-      GRAYLOG_NODE_ID_FILE: "/usr/share/graylog/data/config/node-id"
-      GRAYLOG_PASSWORD_SECRET: "${GRAYLOG_PASSWORD_SECRET:?Please configure GRAYLOG_PASSWORD_SECRET in the .env file}"
-      GRAYLOG_ROOT_PASSWORD_SHA2: "${GRAYLOG_ROOT_PASSWORD_SHA2:?Please configure GRAYLOG_ROOT_PASSWORD_SHA2 in the .env file}"
-      GRAYLOG_HTTP_BIND_ADDRESS: "0.0.0.0:9000"
-      GRAYLOG_HTTP_EXTERNAL_URI: "http://localhost:9001/"
-      GRAYLOG_ELASTICSEARCH_HOSTS: "http://tomato-opensearch:9200"
-      GRAYLOG_MONGODB_URI: "mongodb://tomato-mongodb:27017/graylog"
-    ports:
-      - "5044:5044/tcp"   # Beats
-      - "5140:5140/udp"   # Syslog
-      - "5140:5140/tcp"   # Syslog
-      - "5555:5555/tcp"   # RAW TCP
-      - "5555:5555/udp"   # RAW TCP
-      - "9001:9000/tcp"   # Server API
-      - "12201:12201/tcp" # GELF TCP
-      - "12201:12201/udp" # GELF UDP
-      #- "10000:10000/tcp" # Custom TCP port
-      #- "10000:10000/udp" # Custom UDP port
-      - "13301:13301/tcp" # Forwarder data
-      - "13302:13302/tcp" # Forwarder config
-    volumes:
-      - "graylog_data:/usr/share/graylog/data/data"
-      - "graylog_journal:/usr/share/graylog/data/journal"
-    restart: "on-failure"
-    networks:
-      - tomato
-
-volumes:
-  mongodb_data:
-  os_data:
-  graylog_data:
-  graylog_journal:
-
 networks:
   tomato:
     name: tomato
+
+volumes:
+  db_data:

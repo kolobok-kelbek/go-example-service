@@ -15,8 +15,7 @@ const (
 
 func Load(snapshot embed.FS, env string) (*Config, error) {
 	path := prodPath
-	switch env {
-	case TestEnv:
+	if env == TestEnv {
 		path = testPath
 	}
 

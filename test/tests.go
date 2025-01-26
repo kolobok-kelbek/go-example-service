@@ -18,5 +18,5 @@ func InitRoute() (*http.ServeMux, error) {
 		return nil, err
 	}
 
-	return di.GetRoute(), nil
+	return di.Route(), nil
 }

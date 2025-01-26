@@ -21,7 +21,7 @@ var serverCmd = &cobra.Command{
 			panic(err)
 		}
 
-		err = di.GetApp().Run()
+		err = di.App().Run()
 		if err != nil {
 			panic(err)
 		}

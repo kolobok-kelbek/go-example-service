@@ -1,6 +1,6 @@
 
 server:
-  port: :8081
+  port: :80
 database:
-  DSN: postgres://dev:dev@localhost:5432/dev?sslmode=disable
+  DSN: postgres://dev:dev@tomato-postgres:5432/dev?sslmode=disable
   dialect: postgres

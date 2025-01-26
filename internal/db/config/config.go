@@ -22,6 +22,7 @@ type DataBase struct {
 func (c *DataBase) GetTimeout() time.Duration {
 	return time.Duration(c.MaxLifeTime) * time.Second
 }
+
 func (c *DataBase) Dsn() string {
 	switch c.Dialect {
 	case "postgres":

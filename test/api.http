@@ -1,0 +1,7 @@
+POST http://tomato-api.local:8080/registration
+Content-Type: application/json
+
+{
+  "login": "hello",
+  "password": "world"
+}
